@@ -50,3 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+/.vs
+/RoundRobin/Debug/RoundRobin.tlog
+/RoundRobin/Debug
+/RoundRobin/.vs/RoundRobin/v16
