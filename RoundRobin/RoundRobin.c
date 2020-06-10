@@ -169,12 +169,23 @@ void operation(PCBList* process, const int timeSlice) {
     }
 }
 
+int getInteger() {
+    int c = 0;
+    char[] str[50];
+    int i = 0;
+    for (i = 0; (c = getchar()) != EOF || c != '\n' || i < 49; i++） {
+        str[i] = c;
+    }
+    str[i] = '\0';
+    return atoi(str);
+}
+
 int getProcessCount() {
     
     int process_count = 0;
 
     while (1) {
-        scanf("%d", &process_count);
+        process_count = getInteger();
 
         if (process_count > MAX_PROCESS || process_count <= 0) {
             printf("数量错误！请重新输入：");
@@ -191,7 +202,7 @@ int getProcessCount() {
 int getPositiveInteger() {
     int num = 0;
     while (1) {
-        scanf("%d", &num);
+        num = getInteger();
 
         if (num <= 0) {
             printf("输入数字必须为正整数，你的输入为 %d 请重新输入：", num);
