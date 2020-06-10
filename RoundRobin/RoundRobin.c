@@ -34,19 +34,32 @@ void view(PCBList *process);
 /*
  * 执行 
  */
-void operation(PCBList* process);
+void operation(PCBList* process, const int timeSlice);
+
+/*
+ * 获得时间片长度 
+ */
+const int getTimeSlice();
 
 int main()
 {
-    PCBList process = NULL;
+    PCBList process = (PCBNode*) malloc(sizeof(PCBNode));
+    process->next = NULL;
     init(&process);
-    view(&process);
+    const int timeSlice = getTimeSlice();
 
+    if (timeSlice == 0) {
+        return;
+    }
+
+    view(&process);
+    operation(&process, timeSlice);
 }
 
 void init(PCBList *process)
 {
     PCBNode* newProcess = NULL;
+    
     printf("请输入进程数量(最大值%d)：", MAX_PROCESS);
     int process_count = 0;
     scanf("%d", &process_count);
@@ -54,30 +67,25 @@ void init(PCBList *process)
     if (process_count > MAX_PROCESS) {
         return;
     }
-
+    PCBNode* seek = *process;
     for (int i = 1; i <= process_count; i++) {
         printf("请输入进程P%d需要运行的时间：", i);
         int time = 0;
         scanf("%d", &time);
+
+        if (time <= 0) {
+            return;
+        }
+       
         newProcess = (PCBNode*) malloc(sizeof(PCBNode));
-        newProcess->pid = 1;
+        newProcess->pid = i;
         newProcess->rr = 0;
         newProcess->sta = 'w';
         newProcess->time = time;
         newProcess->next = NULL;
 
-        if (*process == NULL) {
-            *process = newProcess;
-        }
-        else {
-            PCBNode* seek = *process;
-
-            while (seek->next != NULL) {
-                seek = seek->next;
-            }
-
-            seek->next = newProcess;
-        }
+        seek->next = newProcess;
+        seek = seek->next;
     }
 }
 
@@ -99,14 +107,54 @@ void view(PCBList *process)
     printf("|\tpid\t|\trr\t|\ttime\t|\tSTA\t|\n");
     
     while (seek->next != NULL) {
+        seek = seek->next;
         printline(2);
         printf("|\t%d\t|\t%d\t|\t%d\t|\t%c\t|\n", seek->pid, seek->rr, seek->time, seek->sta);
-        seek = seek->next;
     }
 
     printline(1);
 }
 
-void operation(PCBList* process) {
+void operation(PCBList* process, const int timeSlice) {
 
+    while ((*process)->next != NULL) {
+
+        for (PCBList lhs = *process, rhs = (*process)->next; rhs != NULL;) {
+            rhs->sta = 'f';
+            if (rhs->time - rhs->rr - timeSlice > 0) {
+                rhs->rr += timeSlice;
+            }
+            else {
+                rhs->rr = rhs->time;
+            }
+
+            printf("进程 p%d 运行中......\n", rhs->pid);
+            view(process);
+
+            if (rhs->rr == rhs->time) {
+                PCBList tmp = rhs;
+                rhs = rhs->next;
+                lhs->next = rhs;
+            }
+            else {
+                rhs->sta = 'w';
+                lhs = lhs->next;
+                rhs = rhs->next;
+            }
+        }
+
+    }
+}
+
+const int getTimeSlice() {
+    int timeSlice = 0;
+    printf("请输入时间片长度（正整数）：");
+    scanf("%d", &timeSlice);
+
+    if (timeSlice <= 0) {
+        return 0;
+    }
+    else {
+        return timeSlice;
+    }
 }
