@@ -47,6 +47,11 @@ int main()
     // 建立进程表头（链表）
     PCBList process = (PCBNode*) malloc(sizeof(PCBNode));
     process->next = NULL;
+    if (process == NULL) {
+        printf("系统错误!按任意键退出");
+        getchar();
+        exit(-1);
+    }
 
     // 初始化信息
     init(&process);
@@ -79,6 +84,13 @@ void init(PCBList *process)
        
         // 初始化进程信息
         newProcess = (PCBNode*) malloc(sizeof(PCBNode));
+
+        if (newProcess == NULL) {
+            printf("系统错误!按任意键退出");
+            getchar();
+            exit(-1);
+        }
+
         newProcess->pid = i;
         newProcess->rr = 0;
         newProcess->sta = 'w';
